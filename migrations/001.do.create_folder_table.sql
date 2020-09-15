@@ -4,4 +4,3 @@ CREATE TABLE folders (
   title TEXT NOT NULL UNIQUE,
   date_created TIMESTAMPTZ NOT NULL DEFAULT now()
 );
-
