@@ -15,6 +15,19 @@ app.use(helmet());
 app.use(cors());
 
 app.use("/api/folders", foldersRouter);
+
+///////////////////// API KEY VALIDATION /////////////////////
+app.use(function validateBearerToken(req, res, next) {
+  const apiToken = process.env.API_TOKEN;
+  const authToken = req.get("Authorization");
+
+  if (!authToken || authToken.split(" ")[1] !== apiToken) {
+    logger.error(`Unauthorized request to path: ${req.path}`);
+    return res.status(401).json({ error: "Unauthorized request" });
+  }
+  next();
+});
+
 /////////////////////  HOME ENDPOINT /////////////////////
 app.get("/", (req, res) => {
   res.send("Welcome!");
