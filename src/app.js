@@ -14,7 +14,7 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 
-app.use("/api/folders", foldersRouter);
+app.use("/folders", foldersRouter);
 
 ///////////////////// API KEY VALIDATION /////////////////////
 app.use(function validateBearerToken(req, res, next) {
