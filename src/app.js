@@ -4,17 +4,19 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
+const foldersRouter = require("./folders/folders-router");
+const notesRouter = require("./notes/notes-router");
 
 const app = express();
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
-const foldersRouter = require("./folders/folders-router");
+app.use(foldersRouter);
+app.use(notesRouter);
 
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
-
-app.use("/folders", foldersRouter);
+app.use(express.json());
 
 ///////////////////// API KEY VALIDATION /////////////////////
 app.use(function validateBearerToken(req, res, next) {
@@ -22,7 +24,7 @@ app.use(function validateBearerToken(req, res, next) {
   const authToken = req.get("Authorization");
 
   if (!authToken || authToken.split(" ")[1] !== apiToken) {
-    logger.error(`Unauthorized request to path: ${req.path}`);
+    console.error(`Unauthorized request to path: ${req.path}`);
     return res.status(401).json({ error: "Unauthorized request" });
   }
   next();
