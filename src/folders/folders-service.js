@@ -4,13 +4,16 @@ const FoldersService = {
   },
 
   insertFolder(knex, newFolder) {
-    return knex
-      .insert(newFolder)
-      .into("folders")
-      .returning("*")
-      .then((rows) => {
-        return rows[0];
-      });
+    return (
+      knex
+        .insert(newFolder)
+        .into("folders")
+        .returning("*")
+        // returning() method returns an array
+        .then((rows) => {
+          return rows[0];
+        })
+    );
   },
 
   getById(knex, id) {
@@ -18,11 +21,11 @@ const FoldersService = {
   },
 
   deleteFolder(knex, id) {
-    return knex("folders").where({ id }).delete();
+    return knex("folders").where("id", id).del();
   },
 
-  updateFolder(knex, id, newFolderFields) {
-    return knex("folders").where({ id }).update(newFolderFields);
+  updateFolder(knex, id, newFolderField) {
+    return knex("folders").where("id", id).update(newFolderField);
   },
 };
 

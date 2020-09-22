@@ -1,86 +1,104 @@
 const express = require("express");
-// const xss = require("xss");
-const FoldersService = require("./folders-service");
+const path = require("path");
+const xss = require("xss");
 
+const FoldersService = require("./folders-service");
 const foldersRouter = express.Router();
 const jsonParser = express.json();
 
-foldersRouter.route("/folders").get((req, res, next) => {
-  const knexInstance = req.app.get("db");
-  FoldersService.getAllFolders(knexInstance)
-    .then((folders) => {
-      res.json(folders.map((folder) => folder));
-    })
-    .catch(next);
-});
-// .post(jsonParser, (req, res, next) => {
-//   const { client_id, title } = req.body;
-//   const newFolder = { client_id, title };
+foldersRouter
+  .route("/folders")
+  .get((req, res, next) => {
+    const knexInstance = req.app.get("db");
+    FoldersService.getAllFolders(knexInstance)
+      .then((folder) => res.json(folder))
+      .catch(next);
+  })
 
-//   for (const [key, value] of Object.entries(newFolder)) {
-//     if (value == null) {
-//       return res.status(400).json({
-//         error: { message: `Missing '${key}' in request body` },
-//       });
-//     }
-//   }
+  .post(jsonParser, (req, res, next) => {
+    const { title } = req.body;
+    const newFolder = { title };
 
-//   FoldersService.insertFolder(req.app.get("db"), newFolder)
-//     .then((folder) => {
-//       res
-//         .status(201)
-//         .location(path.posix.join(req.originalUrl, `/${folder.id}`))
-//         .json(newFolder);
-//     })
-//     .catch(next);
-// });
+    for (const [key, value] of Object.entries(newFolder)) {
+      if (value == null) {
+        return res.status(400).json({
+          error: { message: `Missing '${key}' in request body` },
+        });
+      }
+    }
 
-// foldersRouter
-//   .route("/folders/:folder_id")
-//   .all((req, res, next) => {
-//     FoldersService.getById(req.app.get("db"), req.params.folder_id)
-//       .then((folder) => {
-//         if (!folder) {
-//           return res.status(404).json({
-//             error: { message: `Folder doesn't exist` },
-//           });
-//         }
-//         res.json({
-//           client_id: xss(folder.id),
-//           title: xss(folder.title),
-//         });
-//       })
-//       .catch(next);
-//   })
+    FoldersService.insertFolder(req.app.get("db"), newFolder)
+      .then((folder) => {
+        res
+          .status(201)
+          // sends a location header with the response
+          .location(path.posix.join(req.originalUrl, `/${folder.id}`))
+          .json(xss(folder));
+      })
+      .catch(next);
+  });
 
-// .delete((req, res, next) => {
-//   FoldersService.deleteFolder(req.app.get("db"), req.params.folder_id)
-//     .then((numRowsAffected) => {
-//       res.status(204).end();
-//     })
-//     .catch(next);
-// })
-// .patch(jsonParser, (req, res, next) => {
-//   const { id, client_id, name, date_created } = req.body;
-//   const folderToUpdate = { client_id, name };
+foldersRouter
+  .route("/folders/:folderid")
+  // .all runs for any HTTP verb; should run first so I can test my req
+  // data before I try to do things with it
+  .all((req, res, next) => {
+    FoldersService.getById(req.app.get("db"), req.params.folderid)
+      .then((folder) => {
+        if (!folder) {
+          // send a 404 status w/ a json error message to the client
+          return res.status(404).json({
+            error: { message: `Folder doesn't exist` },
+          });
+        }
+        // if the folder exists,
+        // store the folder (from the db) returned by knex in
+        // the Express Request obj
+        req.folder = folder;
+        // must call next here because .catch(next)  won't call next()
+        //unless there is an error
+        next();
+      })
+      // should always have a .catch block after your last .then block
+      .catch(next);
+  })
+  .get((req, res) => {
+    res.json({
+      id: xss(req.folder.id),
+      title: xss(req.folder.title),
+    });
+  })
+  .delete(jsonParser, (req, res, next) => {
+    FoldersService.deleteFolder(req.app.get("db"), req.params.folderid)
+      // the service obj returns a Promise-like obj, so I need a .then to
+      // deal with async issues
+      .then(() => {
+        // .end() allows me to send an HTTP status with no content
+        res.status(204).end();
+      })
+      .catch(next);
+  })
+  .patch(jsonParser, (req, res, next) => {
+    const { title } = req.body;
+    const folderToUpdate = { title };
+    const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length;
 
-//   const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length;
-//   if (numberOfValues === 0)
-//     return res.status(400).json({
-//       error: {
-//         message: `Request body must contain a folder name and a unique ID`,
-//       },
-//     });
+    if (numberOfValues === 0)
+      return res.status(400).json({
+        error: {
+          message: `Request body must contain a folder title`,
+        },
+      });
 
-//   FoldersService.updateFolder(
-//     req.app.get("db"),
-//     req.params.folder_id,
-//     folderToUpdate
-//   )
-//     .then((numRowsAffected) => {
-//       res.status(204).end();
-//     })
-//     .catch(next);
-// });
+    FoldersService.updateFolder(
+      req.app.get("db"),
+      req.params.folderid,
+      folderToUpdate
+    )
+      .then(() => {
+        res.status(204).end();
+      })
+      .catch(next);
+  });
 
 module.exports = foldersRouter;
