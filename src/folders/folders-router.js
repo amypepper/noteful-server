@@ -7,7 +7,7 @@ const foldersRouter = express.Router();
 const jsonParser = express.json();
 
 foldersRouter
-  .route("/folders")
+  .route("/api/folders")
   .get((req, res, next) => {
     const knexInstance = req.app.get("db");
     FoldersService.getAllFolders(knexInstance)
@@ -39,7 +39,7 @@ foldersRouter
   });
 
 foldersRouter
-  .route("/folders/:folderid")
+  .route("/api/folders/:folderid")
   // .all runs for any HTTP verb; should run first so I can test my req
   // data before I try to do things with it
   .all((req, res, next) => {

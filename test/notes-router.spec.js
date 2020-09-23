@@ -1,6 +1,6 @@
-const notes = require("../src/notes/notes-router");
+const notes = require("../src/api/notes/api/notes-router");
 
-describe.only(`GET /notes/:note_id`, () => {
+describe.only(`GET /api/notes/:note_id`, () => {
   // context('Given there are notes in the database', () => {/* not shown */})
 
   context(`Given an XSS attack note`, () => {
@@ -18,7 +18,7 @@ describe.only(`GET /notes/:note_id`, () => {
 
     it("removes XSS attack content", () => {
       return supertest(notes)
-        .get(`/notes/${maliciousNote.id}`)
+        .get(`/api/notes/${maliciousNote.id}`)
         .expect(200)
         .expect((res) => {
           expect(res.body.title).to.eql(

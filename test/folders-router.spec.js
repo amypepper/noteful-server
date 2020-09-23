@@ -1,7 +1,7 @@
-// const folders = require("../src/folders/folders-router");
+// const folders = require("../src/api/folders/api/folders-router");
 // const app = require('../src/app');
 
-// describe.only(`GET /folders/:folder_id`, () => {
+// describe.only(`GET /api/folders/:folder_id`, () => {
 //   // context('Given there are folders in the database', () => {/* not shown */})
 //   let db
 
@@ -23,7 +23,7 @@
 
 //     it("removes XSS attack content", () => {
 //       return supertest(folders)
-//         .get(`/folders/${maliciousFolder.id}`)
+//         .get(`/api/folders/${maliciousFolder.id}`)
 //         .expect(200)
 //         .expect((res) => {
 //           expect(res.body.title).to.eql(

@@ -15,7 +15,7 @@ const serializeNote = (note) => ({
 });
 
 notesRouter
-  .route("/notes")
+  .route("/api/notes")
   .get((req, res, next) => {
     const knexInstance = req.app.get("db");
     NotesService.getAllNotes(knexInstance)
@@ -67,7 +67,7 @@ notesRouter
   });
 
 notesRouter
-  .route("/notes/:noteid")
+  .route("/api/notes/:noteid")
   .all((req, res, next) => {
     const number = parseInt(req.params.noteid, 10);
 

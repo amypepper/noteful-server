@@ -4,19 +4,26 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
+const path = require("path");
 const foldersRouter = require("./folders/folders-router");
 const notesRouter = require("./notes/notes-router");
 
 const app = express();
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
-app.use(foldersRouter);
-app.use(notesRouter);
+app.use("/api/folders", foldersRouter);
+app.use("/api/notes", notesRouter);
 
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+// app.use(express.static(path.join(__dirname, "build")));
+
+// app.get("/*", function (req, res) {
+//   res.sendFile(path.join(__dirname, "build", "index.html"));
+// });
 
 ///////////////////// API KEY VALIDATION /////////////////////
 app.use(function validateBearerToken(req, res, next) {
@@ -28,11 +35,6 @@ app.use(function validateBearerToken(req, res, next) {
     return res.status(401).json({ error: "Unauthorized request" });
   }
   next();
-});
-
-/////////////////////  HOME ENDPOINT /////////////////////
-app.get("/", (req, res) => {
-  res.send("Welcome!");
 });
 
 ///////////////////// ERROR HANDLER /////////////////////

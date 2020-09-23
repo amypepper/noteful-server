@@ -1,5 +1,6 @@
 const knex = require("knex");
 const app = require("./app");
+const concurrently = require("concurrently");
 const { PORT, DB_URL } = require("./config");
 
 const db = knex({
