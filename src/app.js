@@ -4,7 +4,6 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const { NODE_ENV } = require("./config");
-const path = require("path");
 const foldersRouter = require("./folders/folders-router");
 const notesRouter = require("./notes/notes-router");
 
@@ -18,12 +17,6 @@ app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
-
-// app.use(express.static(path.join(__dirname, "build")));
-
-// app.get("/*", function (req, res) {
-//   res.sendFile(path.join(__dirname, "build", "index.html"));
-// });
 
 ///////////////////// API KEY VALIDATION /////////////////////
 app.use(function validateBearerToken(req, res, next) {

@@ -4,16 +4,13 @@ const FoldersService = {
   },
 
   insertFolder(knex, newFolder) {
-    return (
-      knex
-        .insert(newFolder)
-        .into("folders")
-        .returning("*")
-        // returning() method returns an array
-        .then((rows) => {
-          return rows[0];
-        })
-    );
+    return knex
+      .insert(newFolder)
+      .into("folders")
+      .returning("*")
+      .then((rows) => {
+        return rows[0];
+      });
   },
 
   getById(knex, id) {
