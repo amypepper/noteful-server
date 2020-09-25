@@ -10,13 +10,13 @@ const notesRouter = require("./notes/notes-router");
 const app = express();
 const morganOption = NODE_ENV === "production" ? "tiny" : "common";
 
-app.use(foldersRouter);
-app.use(notesRouter);
-
 app.use(express.json());
 app.use(morgan(morganOption));
 app.use(helmet());
 app.use(cors());
+
+app.use(foldersRouter);
+app.use(notesRouter);
 
 ///////////////////// API KEY VALIDATION /////////////////////
 app.use(function validateBearerToken(req, res, next) {
