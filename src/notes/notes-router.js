@@ -61,7 +61,7 @@ notesRouter
         res
           .status(201)
           .location(path.posix.join(req.originalUrl, `/${note.id}`))
-          .json(`Note with id ${note.id} created`);
+          .json(note);
       })
       .catch(next);
   });
