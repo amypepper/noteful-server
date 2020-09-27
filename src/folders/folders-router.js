@@ -82,7 +82,7 @@ foldersRouter
       folderToUpdate
     )
       .then((folder) => {
-        res.status(200).json(folder);
+        res.status(200).json(req.folder);
       })
       .catch(next);
   });
